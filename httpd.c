@@ -410,8 +410,14 @@ static char *build_fspath(char *docroot, char *urlpath) {
  * Content-Type を推測する
  */
 static char *guess_content_type(struct FileInfo *info) {
-  // TODO: ファイルの拡張子で判断 or ユーザに指定させる
-  return "text/plain";
+  if (strstr(info->path, ".html"))
+    return "text/html";
+  else if (strstr(info->path, ".png"))
+    return "image/png";
+  else if (strstr(info->path, ".jpg") || strstr(info->path, ".jpeg"))
+    return "image/jpeg";
+  else
+    return "text/plain";
 }
 
 /**
@@ -460,7 +466,7 @@ static void do_file_response(struct HTTPRequest *req, FILE *out,
         log_exit("failed to read %s: %s", info->path, strerror(errno));
       if (n == 0)
         break;
-      if (fwrite(buf, n, 1, out) < n)
+      if (fwrite(buf, 1, n, out) < n)
         log_exit("failed to write to socket: %s", strerror(errno));
     }
     close(fd);
